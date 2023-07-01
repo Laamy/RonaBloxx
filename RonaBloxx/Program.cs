@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using System.Web;
 using System.Net;
+using System.Text.RegularExpressions;
 
 class Program
 {
@@ -53,21 +54,21 @@ class Program
 
             string placeId = HttpUtility.UrlDecode(la.PlaceLauncherUrl).Split('&')[2].Split('=')[1];
 
-            //try
-            //{
-            //    using (WebClient wc = new WebClient())
-            //    {
-            //        string json = wc.DownloadString($"https://games.roblox.com/v1/games/multiget-place-details?placeIds={placeId}");
+            try
+            {
+                string result = RobloxClient.wc.DownloadString($"https://www.roblox.com/games/{placeId}");
 
-            //        MessageBox.Show(json);
+                string name = Regex.Match(result, @"<title>(.*?)<\/title>").Groups[1].Value;
 
-            //        RobloxProcess.place = jss.Deserialize<PlaceRoot>(json);
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show(ex.Message);
-            //}
+                // api was changed i have to now scrap the html for the name
+                RobloxProcess.place = new PlaceRoot();
+                RobloxProcess.place.name = name.Split('-')[0].Trim();
+                RobloxProcess.place.placeId = long.Parse(placeId);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
 
             // store roblox client version for version comparing stuff
             RobloxProcess.version = versionRoot.clientVersionUpload;
