@@ -71,14 +71,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="SDK\GameClient.cs" />
     <Compile Include="SDK\RobloxClient.cs" />
-    <Compile Include="SDK\Structs\Creator.cs" />
-    <Compile Include="SDK\Structs\Datum.cs" />
     <Compile Include="SDK\Structs\LauncherArgs.cs" />
-    <Compile Include="SDK\Structs\RobloxPlace.cs" />
+    <Compile Include="SDK\Structs\PlaceRoot.cs" />
     <Compile Include="SDK\Structs\RobloxProcess.cs" />
-    <Compile Include="SDK\Structs\RobloxUniverse.cs" />
     <Compile Include="SDK\Structs\VersionRoot.cs" />
   </ItemGroup>
   <ItemGroup>

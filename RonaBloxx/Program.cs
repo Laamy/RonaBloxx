@@ -2,7 +2,6 @@
 
 using System;
 using System.IO;
-using System.Net;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Threading;
@@ -10,6 +9,7 @@ using System.Web.Script.Serialization;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.Web;
+using System.Net;
 
 class Program
 {
@@ -50,6 +50,24 @@ class Program
             // fixed using new roblox api (found via burp suite)
             JavaScriptSerializer jss = new JavaScriptSerializer();
             VersionRoot versionRoot = jss.Deserialize<VersionRoot>(RobloxClient.wc.DownloadString("https://clientsettingscdn.roblox.com/v2/client-version/WindowsPlayer"));
+
+            string placeId = HttpUtility.UrlDecode(la.PlaceLauncherUrl).Split('&')[2].Split('=')[1];
+
+            //try
+            //{
+            //    using (WebClient wc = new WebClient())
+            //    {
+            //        string json = wc.DownloadString($"https://games.roblox.com/v1/games/multiget-place-details?placeIds={placeId}");
+
+            //        MessageBox.Show(json);
+
+            //        RobloxProcess.place = jss.Deserialize<PlaceRoot>(json);
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show(ex.Message);
+            //}
 
             // store roblox client version for version comparing stuff
             RobloxProcess.version = versionRoot.clientVersionUpload;
