@@ -2,8 +2,10 @@
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web.Script.Serialization;
 using System.Windows.Forms;
 
 public class RobloxClient
@@ -53,6 +55,21 @@ public class RobloxClient
         // config doesnt exist yet so we make our own
         Directory.CreateDirectory(robloxPath + "\\ClientSettings");
         File.WriteAllText(robloxPath + "\\ClientSettings\\ClientAppSettings.json", $"{{\"DFIntTaskSchedulerTargetFps\":{fps}}}");
+    }
+
+    // fixed GetMainUniverse function
+    public static RobloxUniverse GetMainUniverse(string placeId)
+    {
+        JavaScriptSerializer jss = new JavaScriptSerializer();
+
+        // scrap html for universe id
+        string result = wc.DownloadString($"https://www.roblox.com/games/{placeId}");
+        string universeId = Regex.Match(result, @"universe-id=""(.*?)"">").Groups[1].Value;
+
+        // get universe root as json then deserialize into C# object
+        string json = wc.DownloadString("https://games.roblox.com/v1/games?universeIds=" + universeId);
+
+        return jss.Deserialize<RobloxUniverse>(json);
     }
 
     public static string GetInstallPath()

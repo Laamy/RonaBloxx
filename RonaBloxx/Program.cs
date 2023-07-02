@@ -56,14 +56,7 @@ class Program
 
             try
             {
-                string result = RobloxClient.wc.DownloadString($"https://www.roblox.com/games/{placeId}");
-
-                string name = Regex.Match(result, @"<title>(.*?)<\/title>").Groups[1].Value;
-
-                // api was changed i have to now scrap the html for the name
-                RobloxProcess.place = new PlaceRoot();
-                RobloxProcess.place.name = name.Split('-')[0].Trim();
-                RobloxProcess.place.placeId = long.Parse(placeId);
+                RobloxProcess.universe = RobloxClient.GetMainUniverse(placeId);
             }
             catch (Exception ex)
             {

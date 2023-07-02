@@ -18,9 +18,9 @@ public partial class LauncherWindow : Form
             }
         }
 
-        if (RobloxProcess.place != null && label2.Text != RobloxProcess.place.name)
+        if (RobloxProcess.universe != null)
         {
-            label2.Text = RobloxProcess.place.name;
+            label2.Text = RobloxProcess.universe.data.First().name;
 
             placeId = HttpUtility.UrlDecode(Program.la.PlaceLauncherUrl).Split('&')[2].Split('=')[1];
         }
