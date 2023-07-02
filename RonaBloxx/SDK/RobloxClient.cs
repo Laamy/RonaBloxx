@@ -64,6 +64,8 @@ public class RobloxClient
         // scrap html for universe id
         string result = wc.DownloadString($"https://www.roblox.com/games/{placeId}");
         string universeId = Regex.Match(result, @"universe-id=""(.*?)"">").Groups[1].Value;
+        
+        LauncherWindow.phase++;
 
         // get universe root as json then deserialize into C# object
         string json = wc.DownloadString("https://games.roblox.com/v1/games?universeIds=" + universeId);

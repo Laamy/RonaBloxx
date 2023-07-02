@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.Web;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Linq;
 
 class Program
 {
@@ -33,6 +34,91 @@ class Program
         return new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
     }
 
+    static async Task MainLoop(string[] args)
+    {
+        // arguments meaning its probably roblox trying 2 launch
+        Task.Factory.StartNew(() => Application.Run(new LauncherWindow()));
+
+        // parse launcher arguments
+        la = Launcher.ParseArgs(args[0]);
+
+        string placeId = HttpUtility.UrlDecode(la.PlaceLauncherUrl).Split('&')[2].Split('=')[1];
+
+        CheckGetUniverse(placeId);
+
+        LauncherWindow.phase++;
+
+        // fixed using new roblox api (found via burp suite)
+        JavaScriptSerializer jss = new JavaScriptSerializer();
+        VersionRoot versionRoot = jss.Deserialize<VersionRoot>(RobloxClient.wc.DownloadString("https://clientsettingscdn.roblox.com/v2/client-version/WindowsPlayer"));
+
+        // store roblox client version for version comparing stuff
+        RobloxProcess.version = versionRoot.clientVersionUpload;
+
+        // get roblox install directory
+        string robloxPath = RobloxClient.GetInstallPath();
+        string robloxLatestPath = robloxPath + "\\" + RobloxProcess.version;
+
+        if (!Directory.Exists(robloxLatestPath))
+        {
+            // latest roblox not installed
+            config.Write("RequiresReinstall", "1", "System");
+
+            Task.Factory.StartNew(() => Application.Run(new InstallerWindow(true)));
+            Thread.Sleep(-1);
+        }
+        else
+        {
+            //reinstall stuff
+            if (File.Exists(MDI.mdiBase + "config.ini"))
+            {
+                if (config.KeyExists("RequiresReinstall", "System")
+                    && config.Read("RequiresReinstall", "System") != "0" && !CheckAdminPerms())
+                {
+                    MessageBox.Show("Roblox cant start due to needing a reinstall", "BBRB");
+                    RobloxClient.ExitApp();
+                }
+            }
+        }
+
+        LauncherWindow.phase++;
+
+        // multi instance cuz im a fucking gay fuck
+        RobloxClient.InitMutex();
+
+        // check & set roblox fps cap to unlimited
+        RobloxClient.SetFPS(robloxLatestPath, 999);
+
+        LauncherWindow.phase++;
+
+        // start robloxplayerbeta with the parsed arguments & a copy of the unparsed ones (new or smth idK)
+        StartRoblox(robloxLatestPath, args);
+
+        // pause execution
+        Thread.Sleep(-1);
+    }
+
+    private static async Task CheckGetUniverse(string placeId)
+    {
+        RobloxProcess.universe = RobloxClient.GetMainUniverse(placeId);
+
+        LauncherWindow.phase++;
+    }
+
+    private static async Task StartRoblox(string robloxLatestPath, string[] args)
+    {
+        RobloxProcess.roblox = Process.Start(robloxLatestPath + "\\RobloxPlayerBeta.exe",
+        $"--app " +
+        $"-t {la.GameInfo} " +
+        $"-j {HttpUtility.UrlDecode(la.PlaceLauncherUrl)} " +
+        $"-b {la.TrackerId} " +
+        $"--launchtime={la.LaunchTime} " +
+        $"--rloc {la.RobloxLocale} " +
+        $"--gloc {la.GameLocale} " +
+        args[0]);
+        LauncherWindow.phase++;
+    }
+
     static void Main(string[] args)
     {
         if (args.Length == 0)
@@ -42,77 +128,9 @@ class Program
         }
         else
         {
-            // arguments meaning its probably roblox trying 2 launch
-            Task.Factory.StartNew(() => Application.Run(new LauncherWindow()));
+            MainLoop(args).GetAwaiter().GetResult();
 
-            // parse launcher arguments
-            la = Launcher.ParseArgs(args[0]);
-
-            // fixed using new roblox api (found via burp suite)
-            JavaScriptSerializer jss = new JavaScriptSerializer();
-            VersionRoot versionRoot = jss.Deserialize<VersionRoot>(RobloxClient.wc.DownloadString("https://clientsettingscdn.roblox.com/v2/client-version/WindowsPlayer"));
-
-            string placeId = HttpUtility.UrlDecode(la.PlaceLauncherUrl).Split('&')[2].Split('=')[1];
-
-            // store roblox client version for version comparing stuff
-            RobloxProcess.version = versionRoot.clientVersionUpload;
-
-            // get roblox install directory
-            string robloxPath = RobloxClient.GetInstallPath();
-            string robloxLatestPath = robloxPath + "\\" + RobloxProcess.version;
-
-            if (!Directory.Exists(robloxLatestPath))
-            {
-                // latest roblox not installed
-                config.Write("RequiresReinstall", "1", "System");
-
-                Task.Factory.StartNew(() => Application.Run(new InstallerWindow(true)));
-                Thread.Sleep(-1);
-            }
-            else
-            {
-                //reinstall stuff
-                if (File.Exists(MDI.mdiBase + "config.ini"))
-                {
-                    if (config.KeyExists("RequiresReinstall", "System")
-                        && config.Read("RequiresReinstall", "System") != "0" && !CheckAdminPerms())
-                    {
-                        MessageBox.Show("Roblox cant start due to needing a reinstall", "BBRB");
-                        RobloxClient.ExitApp();
-                    }
-                }
-            }
-
-            // multi instance cuz im a fucking gay fuck
-            RobloxClient.InitMutex();
-
-            // check & set roblox fps cap to unlimited
-            RobloxClient.SetFPS(robloxLatestPath, 999);
-
-            // start robloxplayerbeta with the parsed arguments & a copy of the unparsed ones (new or smth idK)
-            Task.Factory.StartNew(() => {
-                RobloxProcess.roblox = Process.Start(robloxLatestPath + "\\RobloxPlayerBeta.exe",
-                $"--app " +
-                $"-t {la.GameInfo} " +
-                $"-j {HttpUtility.UrlDecode(la.PlaceLauncherUrl)} " +
-                $"-b {la.TrackerId} " +
-                $"--launchtime={la.LaunchTime} " +
-                $"--rloc {la.RobloxLocale} " +
-                $"--gloc {la.GameLocale} " +
-                args[0]);
-            });
-
-            try
-            {
-                RobloxProcess.universe = RobloxClient.GetMainUniverse(placeId);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-
-            // pause execution
-            Thread.Sleep(-1);
+            Console.ReadKey();
         }
     }
 }

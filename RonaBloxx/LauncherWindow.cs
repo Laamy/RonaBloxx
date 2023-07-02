@@ -8,6 +8,8 @@ public partial class LauncherWindow : Form
 {
     public LauncherWindow() => InitializeComponent();
 
+    public static int phase = 0;
+
     private void RobloxTimer_Tick(object sender, EventArgs e)
     {
         foreach (Process proc in Process.GetProcesses())
@@ -21,8 +23,8 @@ public partial class LauncherWindow : Form
         if (RobloxProcess.universe != null)
         {
             Datum datum = RobloxProcess.universe.data.First();
-            label2.Text = $"{datum.name} ({datum.playing}/{datum.maxPlayers})";
-            //label3.Text = datum.description;
+            label2.Text = datum.name;
+            label3.Text = $"{datum.playing}/{datum.maxPlayers}";
 
             placeId = HttpUtility.UrlDecode(Program.la.PlaceLauncherUrl).Split('&')[2].Split('=')[1];
         }
@@ -33,6 +35,8 @@ public partial class LauncherWindow : Form
     int dots = 1;
     private void SuspendTimer_Tick(object sender, EventArgs e)
     {
+        progressBar1.Value = phase;
+
         if (dots == 4) dots = 0;
         dots++;
 
@@ -43,8 +47,8 @@ public partial class LauncherWindow : Form
 
     private void LauncherWindow_Load(object sender, EventArgs e)
     {
-        label2.Text = ""; // label2.Text = "Loading Game Information";
-        //label3.Text = "..";
+        label2.Text = "Roblox Game"; // label2.Text = "Loading Game Information";
+        label3.Text = "0/0";
 
         Opacity = 0.9f;
 
