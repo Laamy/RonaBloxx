@@ -20,7 +20,9 @@ public partial class LauncherWindow : Form
 
         if (RobloxProcess.universe != null)
         {
-            label2.Text = RobloxProcess.universe.data.First().name;
+            Datum datum = RobloxProcess.universe.data.First();
+            label2.Text = $"{datum.name} ({datum.playing}/{datum.maxPlayers})";
+            //label3.Text = datum.description;
 
             placeId = HttpUtility.UrlDecode(Program.la.PlaceLauncherUrl).Split('&')[2].Split('=')[1];
         }
@@ -41,7 +43,8 @@ public partial class LauncherWindow : Form
 
     private void LauncherWindow_Load(object sender, EventArgs e)
     {
-        label2.Text = "";
+        label2.Text = ""; // label2.Text = "Loading Game Information";
+        //label3.Text = "..";
 
         Opacity = 0.9f;
 
@@ -50,6 +53,16 @@ public partial class LauncherWindow : Form
     }
 
     private void formBackground_Click(object sender, EventArgs e)
+    {
+
+    }
+
+    private void label2_Click(object sender, EventArgs e)
+    {
+
+    }
+
+    private void label1_Click(object sender, EventArgs e)
     {
 
     }

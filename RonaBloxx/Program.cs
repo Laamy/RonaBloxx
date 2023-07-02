@@ -54,15 +54,6 @@ class Program
 
             string placeId = HttpUtility.UrlDecode(la.PlaceLauncherUrl).Split('&')[2].Split('=')[1];
 
-            try
-            {
-                RobloxProcess.universe = RobloxClient.GetMainUniverse(placeId);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-
             // store roblox client version for version comparing stuff
             RobloxProcess.version = versionRoot.clientVersionUpload;
 
@@ -110,6 +101,15 @@ class Program
                 $"--gloc {la.GameLocale} " +
                 args[0]);
             });
+
+            try
+            {
+                RobloxProcess.universe = RobloxClient.GetMainUniverse(placeId);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
 
             // pause execution
             Thread.Sleep(-1);
