@@ -35,6 +35,9 @@
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>craiyon_103333_roblox_looking_tree.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -98,7 +101,9 @@
   <ItemGroup>
     <None Include="Resources\robloxlogo.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="craiyon_103333_roblox_looking_tree.ico" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="Resources\hgf.png" />
   </ItemGroup>
