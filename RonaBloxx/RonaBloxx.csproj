@@ -75,6 +75,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="SDK\RobloxClient.cs" />
+    <Compile Include="SDK\Structs\ClientAppSettings.cs" />
     <Compile Include="SDK\Structs\Creator.cs" />
     <Compile Include="SDK\Structs\Datum.cs" />
     <Compile Include="SDK\Structs\LauncherArgs.cs" />
@@ -88,6 +89,7 @@
   <ItemGroup>
     <EmbeddedResource Include="InstallerWindow.resx">
       <DependentUpon>InstallerWindow.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="LauncherWindow.resx">
       <DependentUpon>LauncherWindow.cs</DependentUpon>
