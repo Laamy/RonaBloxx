@@ -48,7 +48,6 @@ class Program
         {
             // latest roblox not installed
             LauncherWindow.handle.Hide();
-            MessageBox.Show("Attempting update...");
 
             config.Write("RequiresReinstall", "1", "System");
 
