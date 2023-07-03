@@ -4,6 +4,8 @@ using System.IO;
 using System.Net;
 using System.Windows.Forms;
 using System;
+using System.Reflection;
+using System.Diagnostics;
 
 partial class InstallerWindow : Form
 {
@@ -18,12 +20,12 @@ partial class InstallerWindow : Form
     {
         progressBar1.Value = 0;
 
-        Program.ReplaceRoblox();
+        RobloxClient.ReplaceRobloxAsync();
         Program.config.Write("RequiresReinstall", "0", "System"); // reset reinstall
 
         progressBar1.Value = 100;
 
-        MessageBox.Show("Installed", "BetterBoogaBooga Installer");
+        MessageBox.Show("Installed", "RonaBloxx Installer");
     }
 
     private void RepairApp(object sender, EventArgs e)
@@ -78,7 +80,7 @@ partial class InstallerWindow : Form
 
         progressBar1.Value = 100;
 
-        MessageBox.Show("Reinstall roblox & better booga booga to finish repair", "BetterBoogaBooga Installer");
+        MessageBox.Show("Reinstall roblox & better booga booga to finish repair", "RonaBloxx Installer");
     }
 
     private void UninstallApp(object sender, EventArgs e) // this one is instant so it doesnt really matter
@@ -114,11 +116,11 @@ partial class InstallerWindow : Form
             if (Directory.Exists(robloxPFPath + "\\" + RobloxProcess.version))
                 robloxPath = robloxPFPath + "\\" + RobloxProcess.version;
         }
-        Program.ReplaceRoblox(robloxPath + "\\RobloxPlayerLauncher.exe");
+        RobloxClient.ReplaceRobloxAsync(robloxPath + "\\RobloxPlayerLauncher.exe");
 
         progressBar1.Value = 100;
 
-        MessageBox.Show("Uninstalled", "BetterBoogaBooga Installer");
+        MessageBox.Show("Uninstalled", "RonaBloxx Installer");
     }
 
     private void InstallerWindow_FormClosing(object sender, FormClosingEventArgs e)
@@ -129,7 +131,24 @@ partial class InstallerWindow : Form
         if (hasToRepair)
         {
             RobloxClient.UpdateRoblox();
-            MessageBox.Show("Reinstall bbrb to update roblox");
+
+            // restart the application with administrator
+            string fileName = Assembly.GetExecutingAssembly().Location;
+            ProcessStartInfo procInfo = new ProcessStartInfo();
+            procInfo.FileName = fileName;
+            procInfo.Verb = "runas";
+
+            try
+            {
+                Process.Start(procInfo);
+                RobloxClient.ExitApp();
+            }
+            catch
+            {
+                // CANCELLED
+                MessageBox.Show("Failed to do setup", "RonaBloxx");
+                RobloxClient.ExitApp();
+            }
         }
 
         if (!Program.CheckAdminPerms())

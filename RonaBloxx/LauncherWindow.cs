@@ -6,7 +6,13 @@ using System;
 
 public partial class LauncherWindow : Form
 {
-    public LauncherWindow() => InitializeComponent();
+    public static LauncherWindow handle;
+
+    public LauncherWindow()
+    {
+        handle = this;
+        InitializeComponent();
+    }
 
     public static int phase = 0;
 
@@ -50,7 +56,7 @@ public partial class LauncherWindow : Form
         label2.Text = "Roblox Game"; // label2.Text = "Loading Game Information";
         label3.Text = "0/0";
 
-        Opacity = 0.9f;
+        //Opacity = 0.9f;
 
         // update label
         label1.Text = loadingSufix + " " + String.Concat(Enumerable.Repeat(".", dots));

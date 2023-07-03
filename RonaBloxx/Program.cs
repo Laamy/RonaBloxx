@@ -1,6 +1,4 @@
-﻿using Microsoft.Win32;
-
-using System;
+﻿using System;
 using System.IO;
 using System.Security.Principal;
 using System.Threading.Tasks;
@@ -9,24 +7,11 @@ using System.Web.Script.Serialization;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.Web;
-using System.Net;
-using System.Text.RegularExpressions;
-using System.Linq;
 
 class Program
 {
     public static LauncherArgs la;
     public static MDIInIFile config = new MDIInIFile();
-
-    public static void ReplaceRoblox(string proc = null)
-    {
-        if (proc == null)
-            proc = AppDomain.CurrentDomain.BaseDirectory + AppDomain.CurrentDomain.FriendlyName;
-
-        RegistryKey key = Registry.ClassesRoot.OpenSubKey("roblox-player\\shell\\open\\command", true);
-        key.SetValue(string.Empty, "\"" + proc + "\" %1");
-        key.Close();
-    }
 
     public static bool CheckAdminPerms()
     {
@@ -56,12 +41,15 @@ class Program
         RobloxProcess.version = versionRoot.clientVersionUpload;
 
         // get roblox install directory
-        string robloxPath = RobloxClient.GetInstallPath();
+        string robloxPath = await RobloxClient.GetInstallPathAsync();
         string robloxLatestPath = robloxPath + "\\" + RobloxProcess.version;
 
         if (!Directory.Exists(robloxLatestPath))
         {
             // latest roblox not installed
+            LauncherWindow.handle.Hide();
+            MessageBox.Show("Attempting update...");
+
             config.Write("RequiresReinstall", "1", "System");
 
             Task.Factory.StartNew(() => Application.Run(new InstallerWindow(true)));
@@ -70,6 +58,7 @@ class Program
         else
         {
             //reinstall stuff
+
             if (File.Exists(MDI.mdiBase + "config.ini"))
             {
                 if (config.KeyExists("RequiresReinstall", "System")
@@ -83,16 +72,16 @@ class Program
 
         LauncherWindow.phase++;
 
-        // multi instance cuz im a fucking gay fuck
-        RobloxClient.InitMutex();
-
-        // check & set roblox fps cap to unlimited
-        RobloxClient.SetFPS(robloxLatestPath, 999);
-
-        LauncherWindow.phase++;
-
         // start robloxplayerbeta with the parsed arguments & a copy of the unparsed ones (new or smth idK)
         StartRoblox(robloxLatestPath, args);
+
+        // check & set roblox fps cap to unlimited
+        RobloxClient.SetFPSAsync(robloxLatestPath, 999);
+
+        // multi instance cuz im a fucking gay fuck
+        RobloxClient.InitMutexAsync();
+
+        LauncherWindow.phase++;
 
         // pause execution
         Thread.Sleep(-1);
@@ -100,7 +89,7 @@ class Program
 
     private static async Task CheckGetUniverse(string placeId)
     {
-        RobloxProcess.universe = RobloxClient.GetMainUniverse(placeId);
+        RobloxProcess.universe = await RobloxClient.GetMainUniverseAsync(placeId);
 
         LauncherWindow.phase++;
     }

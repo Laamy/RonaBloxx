@@ -6,7 +6,7 @@ using System;
 
 public class MDI // Main directory information
 {
-    public static string mdiBase = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\BetterBoogaBooga\\";
+    public static string mdiBase = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\RonaBloxx\\";
     public static bool Init = false;
 
     public static void Initialize()
