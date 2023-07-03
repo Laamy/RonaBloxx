@@ -75,7 +75,7 @@ public class RobloxClient
     {
         string curLoc = Assembly.GetExecutingAssembly().Location;
 
-        if (curLoc.EndsWith("AppData\\Local\\Roblox\\Versions"))
+        if (curLoc.EndsWith("Roblox\\Versions"))
             return; // skip if its already installed there
 
         string installPath = await GetInstallPathAsync();
