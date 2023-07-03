@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -60,12 +61,27 @@ public class RobloxClient
 
     public static async Task ReplaceRobloxAsync(string proc = null)
     {
+        string installPath = await GetInstallPathAsync();
+
         if (proc == null)
-            proc = AppDomain.CurrentDomain.BaseDirectory + AppDomain.CurrentDomain.FriendlyName;
+            proc = installPath + "\\RonaBloxx\\RonaBloxx.exe";
 
         RegistryKey key = Registry.ClassesRoot.OpenSubKey("roblox-player\\shell\\open\\command", true);
         key.SetValue(string.Empty, "\"" + proc + "\" %1");
         key.Close();
+    }
+
+    public static async Task CloneRonaBloxxToRoblox()
+    {
+        string curLoc = Assembly.GetExecutingAssembly().Location;
+
+        if (curLoc.EndsWith("AppData\\Local\\Roblox\\Versions"))
+            return; // skip if its already installed there
+
+        string installPath = await GetInstallPathAsync();
+
+        Directory.CreateDirectory(installPath + "\\RonaBloxx");
+        File.Copy(Assembly.GetExecutingAssembly().Location, installPath + "\\RonaBloxx\\RonaBloxx.exe");
     }
 
     // fixed GetMainUniverse function

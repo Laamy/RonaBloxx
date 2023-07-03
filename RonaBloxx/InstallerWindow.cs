@@ -21,6 +21,7 @@ partial class InstallerWindow : Form
         progressBar1.Value = 0;
 
         RobloxClient.ReplaceRobloxAsync();
+        RobloxClient.CloneRonaBloxxToRoblox();
         Program.config.Write("RequiresReinstall", "0", "System"); // reset reinstall
 
         progressBar1.Value = 100;
@@ -80,7 +81,7 @@ partial class InstallerWindow : Form
 
         progressBar1.Value = 100;
 
-        MessageBox.Show("Reinstall roblox & better booga booga to finish repair", "RonaBloxx Installer");
+        MessageBox.Show("Reinstall roblox & RonaBloxx to finish repair", "RonaBloxx Installer");
     }
 
     private void UninstallApp(object sender, EventArgs e) // this one is instant so it doesnt really matter
