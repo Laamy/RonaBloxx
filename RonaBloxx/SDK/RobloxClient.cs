@@ -127,6 +127,12 @@ public class RobloxClient
 
     public static async Task<string> GetInstallPathAsync()
     {
+        // Found a possible bug, basically if roblox is installed in the program files folder
+        // cuz u need adminstrator the launcher cant apply the game settings
+        // not sure how to go about this
+
+        // TODO: Fix permissions bug for program file install folder
+
         string output = "";
 
         string robloxFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Roblox\\Versions";
