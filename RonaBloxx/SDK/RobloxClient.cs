@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -7,12 +8,18 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web.Configuration;
 using System.Web.Script.Serialization;
 
 public class RobloxClient
 {
     public static Mutex robloxMutex;
+
+    public static void SetTitle(Process proc, string title)
+    {
+        IntPtr windowHandle = proc.MainWindowHandle;
+
+        User32.SetWindowText(windowHandle, title);
+    }
 
     public static void InitMutexAsync()
     {
@@ -82,6 +89,16 @@ public class RobloxClient
 
         Directory.CreateDirectory(installPath + "\\RonaBloxx");
         File.Copy(Assembly.GetExecutingAssembly().Location, installPath + "\\RonaBloxx\\RonaBloxx.exe");
+    }
+
+    public static async Task<string> GetRobloxVersionAsync()
+    {
+        // fixed using new roblox api (found via burp suite)
+        JavaScriptSerializer jss = new JavaScriptSerializer();
+        VersionRoot versionRoot = jss.Deserialize<VersionRoot>(RobloxClient.wc.DownloadString("https://clientsettingscdn.roblox.com/v2/client-version/WindowsPlayer"));
+
+        // store roblox client version for version comparing stuff
+        return versionRoot.clientVersionUpload;
     }
 
     // fixed GetMainUniverse function

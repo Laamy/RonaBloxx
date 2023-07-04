@@ -33,12 +33,8 @@ class Program
 
         LauncherWindow.phase++;
 
-        // fixed using new roblox api (found via burp suite)
-        JavaScriptSerializer jss = new JavaScriptSerializer();
-        VersionRoot versionRoot = jss.Deserialize<VersionRoot>(RobloxClient.wc.DownloadString("https://clientsettingscdn.roblox.com/v2/client-version/WindowsPlayer"));
-
         // store roblox client version for version comparing stuff
-        RobloxProcess.version = versionRoot.clientVersionUpload;
+        RobloxProcess.version = await RobloxClient.GetRobloxVersionAsync();
 
         // get roblox install directory
         string robloxPath = await RobloxClient.GetInstallPathAsync();

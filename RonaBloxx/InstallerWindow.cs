@@ -25,8 +25,6 @@ partial class InstallerWindow : Form
         Program.config.Write("RequiresReinstall", "0", "System"); // reset reinstall
 
         progressBar1.Value = 100;
-
-        MessageBox.Show("Installed", "RonaBloxx Installer");
     }
 
     private void RepairApp(object sender, EventArgs e)
@@ -35,93 +33,64 @@ partial class InstallerWindow : Form
 
         Program.config.Write("RequiresReinstall", "1", "System"); // force reinstall
 
-        string robloxFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
-            + "\\Roblox\\Versions";
-        string robloxPFPath = "C:\\Program Files (x86)\\Roblox\\Versions"; // some people have other folder so this fixes it ig
+        string robloxPath = RobloxClient.GetInstallPathAsync().GetAwaiter().GetResult();
 
-        WebClient wc = new WebClient();
-
-        RobloxProcess.version = wc.DownloadString("https://setup.rbxcdn.com/version");
-
-        string robloxPath = "";
-
-        if (!Directory.Exists(robloxFolder + "\\" + RobloxProcess.version) && !Directory.Exists(robloxPFPath + "\\" + RobloxProcess.version))
+        if (!Directory.Exists($"{robloxPath}\\RonaBloxx"))
         {
-            Program.config.Write("RequiresReinstall", "1", "System");
-
-            MessageBox.Show("Latest roblox version not detected (FATAL FAILURE)", "BBRB");
+            MessageBox.Show("Failed to find ronabloxx");
             return;
         }
-        else
+
+        RobloxProcess.version = RobloxClient.GetRobloxVersionAsync().GetAwaiter().GetResult();
+
+        RobloxClient.ReplaceRobloxAsync($"{robloxPath}\\{RobloxProcess.version}\\RobloxPlayerLauncher.exe").GetAwaiter();
+
+        DirectoryInfo[] dicks = new DirectoryInfo(robloxPath).GetDirectories();
+        float increaseBy = 100 / dicks.Length;
+
+        foreach (DirectoryInfo folder in dicks) // this is so lazy
         {
-            if (Directory.Exists(robloxFolder + "\\" + RobloxProcess.version))
-                robloxPath = robloxFolder + "\\" + RobloxProcess.version;
-
-            if (Directory.Exists(robloxPFPath + "\\" + RobloxProcess.version))
-                robloxPath = robloxPFPath + "\\" + RobloxProcess.version;
-        }
-
-        List<string> folders = new List<string>();
-
-        if (Directory.Exists(robloxFolder))
-            folders.AddRange(Directory.GetDirectories(robloxFolder));
-
-        if (Directory.Exists(robloxPFPath))
-            folders.AddRange(Directory.GetDirectories(robloxPFPath));
-
-        float increaseBy = 100 / robloxFolder.Length;
-
-        foreach (string version in folders.ToArray()) // this is so lazy
-        {
-            Directory.Delete(version, true);
+            folder.Delete(true);
             progressBar1.Value += (int)increaseBy;
         }
 
-        RobloxClient.UpdateRoblox(); // this is a massive flaw..
+        RobloxClient.UpdateRoblox();
 
         progressBar1.Value = 100;
-
-        MessageBox.Show("Reinstall roblox & RonaBloxx to finish repair", "RonaBloxx Installer");
     }
 
     private void UninstallApp(object sender, EventArgs e) // this one is instant so it doesnt really matter
     {
         progressBar1.Value = 0;
 
-        var robloxVersions = Directory.GetDirectories(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Roblox\\Versions");
-
         Program.config.Write("RequiresReinstall", "1", "System");
 
-        string robloxFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
-            + "\\Roblox\\Versions";
-        string robloxPFPath = "C:\\Program Files (x86)\\Roblox\\Versions"; // some people have other folder so this fixes it ig
+        string robloxPath = RobloxClient.GetInstallPathAsync().GetAwaiter().GetResult();
 
-        WebClient wc = new WebClient();
-
-        RobloxProcess.version = wc.DownloadString("https://setup.rbxcdn.com/version");
-
-        string robloxPath = "";
-
-        if (!Directory.Exists(robloxFolder + "\\" + RobloxProcess.version) && !Directory.Exists(robloxPFPath + "\\" + RobloxProcess.version))
+        if (!Directory.Exists($"{robloxPath}\\RonaBloxx"))
         {
-            Program.config.Write("RequiresReinstall", "1", "System");
-
-            MessageBox.Show("Latest roblox version not detected (FATAL FAILURE)", "BBRB");
+            MessageBox.Show("Failed to find ronabloxx");
             return;
         }
-        else
-        {
-            if (Directory.Exists(robloxFolder + "\\" + RobloxProcess.version))
-                robloxPath = robloxFolder + "\\" + RobloxProcess.version;
 
-            if (Directory.Exists(robloxPFPath + "\\" + RobloxProcess.version))
-                robloxPath = robloxPFPath + "\\" + RobloxProcess.version;
+        RobloxProcess.version = RobloxClient.GetRobloxVersionAsync().GetAwaiter().GetResult();
+
+        RobloxClient.ReplaceRobloxAsync($"{robloxPath}\\{RobloxProcess.version}\\RobloxPlayerLauncher.exe").GetAwaiter();
+
+        Directory.Delete($"{robloxPath}\\RonaBloxx", true);
+
+        if (File.Exists($"{robloxPath}\\{RobloxProcess.version}\\ClientSettings"))
+        {
+            Directory.Delete($"{robloxPath}\\{RobloxProcess.version}\\ClientSettings", true);
         }
-        RobloxClient.ReplaceRobloxAsync(robloxPath + "\\RobloxPlayerLauncher.exe");
 
         progressBar1.Value = 100;
 
-        MessageBox.Show("Uninstalled", "RonaBloxx Installer");
+        //string batchFile = Path.Combine(Path.GetTempPath(), "delete.bat");
+        //string deleteCommand = $"ping 127.0.0.1 -n 2 > nul & del \"{Assembly.GetExecutingAssembly().Location}\"";
+        //File.WriteAllText(batchFile, deleteCommand);
+        //Process.Start(new ProcessStartInfo(batchFile) { WindowStyle = ProcessWindowStyle.Hidden });
+        //RobloxClient.ExitApp();
     }
 
     private void InstallerWindow_FormClosing(object sender, FormClosingEventArgs e)

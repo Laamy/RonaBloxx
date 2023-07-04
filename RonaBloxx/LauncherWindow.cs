@@ -3,6 +3,8 @@ using System.Linq;
 using System.Web;
 using System.Windows.Forms;
 using System;
+using System.Threading.Tasks;
+using System.Threading;
 
 public partial class LauncherWindow : Form
 {
@@ -22,7 +24,17 @@ public partial class LauncherWindow : Form
         {
             if (proc.MainWindowTitle == "Roblox")
             {
-                RobloxClient.ExitApp();
+                robloxTimer.Stop();
+                Hide(); // hide for now
+
+                Task.Factory.StartNew(() =>
+                {
+                    Thread.Sleep(1000); // ??
+
+                    RobloxClient.SetTitle(proc, $"Roblox - (RonaBloxx)"); // {RobloxProcess.version}
+
+                    RobloxClient.ExitApp();
+                });
             }
         }
 

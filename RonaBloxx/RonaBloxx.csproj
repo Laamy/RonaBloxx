@@ -82,6 +82,7 @@
     <Compile Include="SDK\Structs\RobloxProcess.cs" />
     <Compile Include="SDK\Structs\RobloxUniverse.cs" />
     <Compile Include="SDK\Structs\VersionRoot.cs" />
+    <Compile Include="SDK\User32.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
