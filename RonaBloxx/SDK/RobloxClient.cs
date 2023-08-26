@@ -138,7 +138,6 @@ public class RobloxClient
         string robloxFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Roblox\\Versions";
         string robloxPFPath = "C:\\Program Files (x86)\\Roblox\\Versions";
 
-
         if (Directory.Exists(robloxFolder))
             output = robloxFolder;
 

@@ -3,7 +3,6 @@ using System.IO;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Threading;
-using System.Web.Script.Serialization;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.Web;
@@ -43,10 +42,13 @@ class Program
         if (!Directory.Exists(robloxLatestPath))
         {
             // latest roblox not installed
-            LauncherWindow.handle.Hide();
+            LauncherWindow.handle.Invoke((MethodInvoker)delegate {
+                LauncherWindow.handle.Hide();
+            });
 
             config.Write("RequiresReinstall", "1", "System");
 
+            // NOTE: i dont need to start a new thread for this cuz async
             Task.Factory.StartNew(() => Application.Run(new InstallerWindow(true)));
             Thread.Sleep(-1);
         }
@@ -59,9 +61,13 @@ class Program
                 if (config.KeyExists("RequiresReinstall", "System")
                     && config.Read("RequiresReinstall", "System") != "0" && !CheckAdminPerms())
                 {
+                    LauncherWindow.handle.Invoke((MethodInvoker)delegate {
+                        LauncherWindow.handle.Hide();
+                    });
+
                     MessageBox.Show("Roblox cant start due to needing a reinstall", "BBRB");
                     RobloxClient.ExitApp();
-                }
+                } 
             }
         }
 
@@ -69,7 +75,7 @@ class Program
 
         // start robloxplayerbeta with the parsed arguments & a copy of the unparsed ones (new or smth idK)
         StartRoblox(robloxLatestPath, args);
-
+         
         // check & set roblox fps cap to unlimited
         RobloxClient.SetFPSAsync(robloxLatestPath, 999);
 
@@ -113,8 +119,6 @@ class Program
         else
         {
             MainLoop(args).GetAwaiter().GetResult();
-
-            Console.ReadKey();
         }
     }
 }
